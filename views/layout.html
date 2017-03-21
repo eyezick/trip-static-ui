@@ -42,7 +42,7 @@
 
     <script src="/jquery/jquery.min.js"></script>
     <script src="/bootstrap/js/bootstrap.min.js"></script>
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDfQxgWt-LSZcEmTEN8581Uq9SzZHnpuys"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBeyEBuDG-ylfwAyKqareUiwUwFqrFi0wg"></script>
     <script src="/js/map.js"></script>
 
 
@@ -52,7 +52,7 @@
         var hotels = {{ hotels | dump | safe }};
         var restaurants = {{ restaurants | dump | safe }};
         var activities = {{ activities | dump | safe }};
-
+        console.log(hotels)
         // loops to create option items in dropdowns
         hotels.forEach(function (hotel) {
             $('#hotel-choices').append('<option>'+hotel.name+'</option>')
@@ -65,19 +65,45 @@
         })
 
         // get value from selected item in dropdown
-        $( "#options-panel" ).on( "click", '.btn', function(event) {
+        $("#options-panel").on("click", '.btn', function (event) {
             var type = event.currentTarget.previousElementSibling.id;
             var value = $('#' + type + ' option:selected').text();
-            var itemName = type.split('-')[0] + "-it";
+            console.log('')
+//            console.log('value',value)
+            var itemName = type.split('-')[0] +'-it';
             $('#' + itemName)
-            .siblings()
-            .first()
-            .append('<div class="itinerary-item">' + value + '<button class="btn btn-xs btn-danger remove btn-circle pull-right">x</button></div>');
-        });
+                .siblings()
+                .first()
+                .append('<div class="itinerary-item">' + value + '<button class="btn btn-xs btn-danger remove btn-circle pull-right">x</button></div>');
 
-        // construct an itinerary item
+            var coordinates
+            if (itemName == 'hotel-it') {
+                console.log(itemName)
+                coordinates = hotels.find(function (hotel) {
+                    console.log(value)
+                    return hotel.name == value;
+                })
+            }
+            else if (itemName == 'restaurant-it') {
+                console.log(itemName)
+                coordinates = restaurants.find(function (rest) {
+                    console.log(value)
+                    return rest.name == value;
+                })
+            }
+            else {coordinates = activities.find(function (act) {
+                console.log(value)
+                console.log(itemName)
+                return act.name == value;
+            })
+            }
+            coordinates = coordinates.place.location
+            console.log(coordinates)
+        })
 
+        // construct add marker
 
+//(whatever Hotel Object).place.location == Array of the lat and long numbers
 
     </script>
   </body>
