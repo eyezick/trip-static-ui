@@ -47,13 +47,17 @@
     <script>
         // google map
         $(function initializeMap (){ var fullstackAcademy = new google.maps.LatLng(40.705086, -74.009151); var styleArr = [{ featureType: 'landscape', stylers: [{ saturation: -100 }, { lightness: 60 }] }, { featureType: 'road.local', stylers: [{ saturation: -100 }, { lightness: 40 }, { visibility: 'on' }] }, { featureType: 'transit', stylers: [{ saturation: -100 }, { visibility: 'simplified' }] }, { featureType: 'administrative.province', stylers: [{ visibility: 'off' }] }, { featureType: 'water', stylers: [{ visibility: 'on' }, { lightness: 30 }] }, { featureType: 'road.highway', elementType: 'geometry.fill', stylers: [{ color: '#ef8c25' }, { lightness: 40 }] }, { featureType: 'road.highway', elementType: 'geometry.stroke', stylers: [{ visibility: 'off' }] }, { featureType: 'poi.park', elementType: 'geometry.fill', stylers: [{ color: '#b6c54c' }, { lightness: 40 }, { saturation: -40 }] }];
-        var mapCanvas = document.getElementById('map-canvas'); var currentMap = new google.maps.Map(mapCanvas, { center: fullstackAcademy, zoom: 13, mapTypeId: google.maps.MapTypeId.ROADMAP, styles: styleArr }); var iconURLs = { hotel: '/images/lodging_0star.png', restaurant: '/images/restaurant.png', activity: '/images/star-3.png' }; function drawMarker (type, coords) { var latLng = new google.maps.LatLng(coords[0], coords[1]); var iconURL = iconURLs[type]; var marker = new google.maps.Marker({ icon: iconURL, position: latLng }); marker.setMap(currentMap); }
+        var mapCanvas = document.getElementById('map-canvas'); var currentMap = new google.maps.Map(mapCanvas, { center: fullstackAcademy, zoom: 13, mapTypeId: google.maps.MapTypeId.ROADMAP, styles: styleArr }); var iconURLs = { hotel: '/images/lodging_0star.png', restaurant: '/images/restaurant.png', activity: '/images/star-3.png' };
+
+        function drawMarker (type, coords) { var latLng = new google.maps.LatLng(coords[0], coords[1]); var iconURL = iconURLs[type]; var marker = new google.maps.Marker({ icon: iconURL, position: latLng }); marker.setMap(currentMap); return marker}
+
+
+        let currentMarkers = {}
 
         // data objects from db
         var hotels = {{ hotels | dump | safe }};
         var restaurants = {{ restaurants | dump | safe }};
         var activities = {{ activities | dump | safe }};
-        console.log(hotels)
 
         // loops to create option items in dropdowns
         hotels.forEach(function (hotel) {
@@ -75,7 +79,7 @@
                 .siblings()
                 .first()
                 .append('<div class="itinerary-item">' + value + '<button class="btn btn-xs btn-danger remove btn-circle pull-right">x</button></div>');
-
+            // find coordinates
             var coordinates
             if (itemName == 'hotel-it') {
                 coordinates = hotels.find(function (hotel) {
@@ -95,42 +99,22 @@
             // create markers
             coordinates = coordinates.place.location;
             var marker = drawMarker(itemName.split("-")[0], coordinates);
-            $('#' + itemName).data('marker', marker);
+
+//            console.log($('#' + itemName).siblings().children())
+
+            $('#' + itemName).siblings().children().data(marker)
+
         })
 
-        // 
+            let person = {'first':'isaac', 'last': 'ibiapina'}
+
+
         $("#itinerary").on("click", '.btn', function (event) {
-            console.log($(this).data());
-            // $(this).data('marker').setMap(null);
+                $(this).parent().data().setMap(null)
+//
+
+            // last thing below
             $(this).parent().remove();
-
-            // var value = $('#' + type + ' option:selected').text();
-//            console.log('value',value)
-        //     var itemName = type.split('-')[0] +'-it';
-        //     $('#' + itemName)
-        //         .siblings()
-        //         .first()
-        //         .append('<div class="itinerary-item">' + value + '<button class="btn btn-xs btn-danger remove btn-circle pull-right">x</button></div>');
-
-        //     var coordinates
-        //     if (itemName == 'hotel-it') {
-        //         coordinates = hotels.find(function (hotel) {
-        //             return hotel.name == value;
-        //         })
-        //     }
-        //     else if (itemName == 'restaurant-it') {
-        //         coordinates = restaurants.find(function (rest) {
-        //             return rest.name == value;
-        //         })
-        //     }
-        //     else {coordinates = activities.find(function (act) {
-        //         return act.name == value;
-        //         })
-        //     }
-
-        //     // create markers
-        //     coordinates = coordinates.place.location;
-        //     drawMarker(itemName.split("-")[0], coordinates);
         })
 
     })
